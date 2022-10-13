@@ -1,13 +1,44 @@
+# name: of wf as it will appear in "Actions" tab
+# name: is optional
 name: learn-github-actions
+
+# run-name: for wf runs generated from the workflow
+# will appear in the list of workflow runs on your repo's "Actions" tab
+# This ex uses an expression w/ github context to display the username  actor that triggered wf run
 run-name: ${{ github.actor }} is learning GitHub Actions
+
+# on: specifies trigger for wf
+# This ex uses push event, so a wf run is triggered every time someone pushes changes to repo or merges pull request 
+# This is triggered by a push to every branch
 on: [push]
+
+# jobs: groups 2gether all jobs that run in this "learn-github-actions" workflow
 jobs:
+
+  # Defines a job named check-bats-version. The child keys will define properties of the job
   check-bats-version:
+  
+    # runs-on: configs job 2 run on latest version of Ubuntu Linux runner 
+    # This means that job will execute on fresh VM hosted by GitHub
     runs-on: ubuntu-latest
+    
+    # steps: groups 2gether all steps that run in the check-bats-version: job
+    # each item nested under this section is separate action/shell script
     steps:
+    
+      # The uses: keyword specifies that step will run v3 of the actions/checkout action
+      # This is an action that checks out repo onto the runner, allowing to run scripts/other actions against code _ 
+      # (such as build & test tools). Should use checkout action any time wf will run against repos code
       - uses: actions/checkout@v3
+      
+      # This step uses: actions/setup-node@v3 action to install specified version of Node.js _
+      # (this ex uses v14). Puts both node & npm commands in your PATH.
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
+          
+      # run: keyword tells job to execute a command on runner. In this case, we're using npm to install bats s/w testing pkg
       - run: npm install -g bats
+      
+      # Finally, we'll run bats command with parameter that outputs s/w version
       - run: bats -v
